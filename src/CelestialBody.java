@@ -1,4 +1,8 @@
+// Cate Schick
+// Comp Sci 201
+// P1
 
+import java.util.Scanner;
 
 /**
  * Celestial Body class for NBody
@@ -25,7 +29,14 @@ public class CelestialBody {
 	 */
 	public CelestialBody(double xp, double yp, double xv,
 			             double yv, double mass, String filename){
-		// TODO: complete constructor
+
+		myXPos = xp;
+		myYPos = yp;
+		myXVel = xv;
+		myYVel = yv;
+		myMass = mass;
+		myFileName = filename;
+
 	}
 
 	/**
@@ -34,37 +45,56 @@ public class CelestialBody {
 	 * @param b used to initialize this body
 	 */
 	public CelestialBody(CelestialBody b){
-		// TODO: complete constructor
+		this(b.getX(), b.getY(), b.getXVel(), b.getYVel(), b.getMass(), b.getName());
+
 	}
 
+	/**
+	 * Returns the x-position of this Body
+	 * @return
+	 */
 	public double getX() {
-		// TODO: complete method
-		return 0.0;
+		return myXPos;
 	}
+
+	/**
+	 * Returns the y-position of this Body
+	 * @return
+	 */
 	public double getY() {
-		// TODO: complete method
-		return 0.0;
+		return myYPos;
 	}
+
+	/**
+	 * Returns the x-velocity of this Body
+	 * @return
+	 */
 	public double getXVel() {
-		// TODO: complete method
-		return 0.0;
+		return myXVel;
 	}
+
 	/**
 	 * Return y-velocity of this Body.
-	 * @return value of y-velocity.
+	 * @return
 	 */
 	public double getYVel() {
-		// TODO: complete method
-		return 0.0;
+		return myYVel;
 	}
-	
+
+	/**
+	 * Returns the mass of this Body
+	 * @return
+	 */
 	public double getMass() {
-		// TODO: complete method
-		return 0.0;
+		return myMass;
 	}
+
+	/**
+	 * Returns the filename of this Body
+	 * @return
+	 */
 	public String getName() {
-		// TODO: complete method
-		return "cow planet";
+		return myFileName;
 	}
 
 	/**
@@ -73,38 +103,105 @@ public class CelestialBody {
 	 * @return distance between this body and b
 	 */
 	public double calcDistance(CelestialBody b) {
-		// TODO: complete method
-		return 0.0;
+		double rsquared = ((getX() - b.getX()) * (getX() - b.getX())) +
+				((getY() - b.getY()) * (getY() - b.getY()));
+		return Math.sqrt(rsquared);
 	}
 
+	/**
+	 * Returns the total force exerted by the Body
+	 * @param b
+	 * @return
+	 */
 	public double calcForceExertedBy(CelestialBody b) {
-		// TODO: complete method
-		return 0.0;
+		double g = (6.67 * 1e-11);
+		double distance = calcDistance(b);
+		double force = g * ((getMass() * b.getMass()) / (distance * distance));
+		return force;
 	}
 
+	/**
+	 * Returns the force exerted in the x-direction
+	 * @param b
+	 * @return
+	 */
 	public double calcForceExertedByX(CelestialBody b) {
-		// TODO: complete method
-		return 0.0;
+		double r = calcDistance(b);
+		double f = calcForceExertedBy(b);
+		double dx = (b.getX() - getX());
+		double fx = f * (dx / r);
+
+		return fx;
 	}
+
+	/**
+	 * Returns the force exerted in the y-direction
+	 * @param b
+	 * @return
+	 */
 	public double calcForceExertedByY(CelestialBody b) {
-		// TODO: complete method
-		return 0.0;
+		double r = calcDistance(b);
+		double f = calcForceExertedBy(b);
+		double dy = (b.getY() - getY());
+		double fy = f * (dy / r);
+
+		return fy;
 	}
 
+	/**
+	 * Returns the net force exerted by all bodies in the x-direction
+	 * @param bodies
+	 * @return
+	 */
 	public double calcNetForceExertedByX(CelestialBody[] bodies) {
-		// TODO: complete method
-		double sum = 0.0;
+		double sum = 0;
+		for(int i = 0; i < bodies.length; i++)
+		{
+			if(!bodies[i].equals(this)) {
+				sum += calcForceExertedByX(bodies[i]);
+			}
+		}
 		return sum;
 	}
 
+	/**
+	 * Returns the net force exerted by all bodies in the y-direction
+	 * @param bodies
+	 * @return
+	 */
 	public double calcNetForceExertedByY(CelestialBody[] bodies) {
-		double sum = 0.0;
+		double sum = 0;
+		for(int i = 0; i < bodies.length; i++)
+		{
+			if(!bodies[i].equals(this)) {
+				sum += calcForceExertedByY(bodies[i]);
+			}
+		}
 		return sum;
 	}
 
+	/**
+	 * Returns an updated state variable of CelestialBody object
+	 * @param deltaT
+	 * @param xforce
+	 * @param yforce
+	 */
 	public void update(double deltaT, 
 			           double xforce, double yforce) {
-		// TODO: complete method
+		// get acceleration
+		double ax = xforce/this.getMass();
+		double ay = yforce/this.getMass();
+
+		// get new position values
+		double nvx = deltaT*ax + myXVel;
+		double nvy = deltaT*ay + myYVel;
+
+		myXVel = nvx;
+		myYVel = nvy;
+
+		// Positions need to update by adding deltaT*nv(x or y)
+		myXPos = myXPos + deltaT*nvx;
+		myYPos = myYPos + deltaT*nvy;
 	}
 
 	/**
